@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Markov Chain Calculator</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Markov Chain Calculator</h1>
+        <form id="live-markov-form">
+            <label for="live_match_type">Select Match Type:</label>
+            <select id="live_match_type" name="live_match_type" required>
+                <option value="Men's">Men's</option>
+                <option value="Women's">Women's</option>
+            </select>
+            <label for="live_server">Who is serving?</label>
+            <select id="live_server" name="live_server" required>
+                <option value="Player 1">Player 1</option>
+                <option value="Player 2">Player 2</option>
+            </select>
+            <div class="players-container">
+                <div class="player-column">
+                    <label for="live_p1_name">Player 1 Name:</label>
+                    <input type="text" id="live_p1_name" name="live_p1_name" required>
+                    <label for="live_p1_first_serve" id="live_p1_first_serve_label">Player 1 First Serve Win Percentage:</label>
+                    <input type="number" id="live_p1_first_serve" name="live_p1_first_serve" step="0.01" min="0" max="1" required inputmode="decimal">
+                    <label for="live_p1_second_serve" id="live_p1_second_serve_label">Player 1 Second Serve Win Percentage:</label>
+                    <input type="number" id="live_p1_second_serve" name="live_p1_second_serve" step="0.01" min="0" max="1" required inputmode="decimal">
+                    <label for="live_p1_break_point" id="live_p1_break_point_label">Player 1 Break Point Conversion Rate:</label>
+                    <input type="number" id="live_p1_break_point" name="live_p1_break_point" step="0.01" min="0" max="1" required inputmode="decimal">
+                </div>
+                <div class="divider"></div>
+                <div class="player-column">
+                    <label for="live_p2_name">Player 2 Name:</label>
+                    <input type="text" id="live_p2_name" name="live_p2_name" required>
+                    <label for="live_p2_first_serve" id="live_p2_first_serve_label">Player 2 First Serve Win Percentage:</label>
+                    <input type="number" id="live_p2_first_serve" name="live_p2_first_serve" step="0.01" min="0" max="1" required inputmode="decimal">
+                    <label for="live_p2_second_serve" id="live_p2_second_serve_label">Player 2 Second Serve Win Percentage:</label>
+                    <input type="number" id="live_p2_second_serve" name="live_p2_second_serve" step="0.01" min="0" max="1" required inputmode="decimal">
+                    <label for="live_p2_break_point" id="live_p2_break_point_label">Player 2 Break Point Conversion Rate:</label>
+                    <input type="number" id="live_p2_break_point" name="live_p2_break_point" step="0.01" min="0" max="1" required inputmode="decimal">
+                </div>
+            </div>
+            <div class="score-inputs">
+                <div class="score-row">
+                    <label for="live_p1_points">Player 1 Points:</label>
+                    <input type="text" id="live_p1_points" name="live_p1_points" placeholder="0, 15, 30, 40" pattern="0|15|30|40" required inputmode="numeric">
+                </div>
+                <div class="score-row">
+                    <label for="live_p1_games">Player 1 Games:</label>
+                    <input type="number" id="live_p1_games" name="live_p1_games" min="0" required inputmode="numeric">
+                </div>
+                <div class="score-row">
+                    <label for="live_p1_sets">Player 1 Sets:</label>
+                    <input type="number" id="live_p1_sets" name="live_p1_sets" min="0" required inputmode="numeric">
+                </div>
+                <div class="score-row">
+                    <label for="live_p2_points">Player 2 Points:</label>
+                    <input type="text" id="live_p2_points" name="live_p2_points" placeholder="0, 15, 30, 40" pattern="0|15|30|40" required inputmode="numeric">
+                </div>
+                <div class="score-row">
+                    <label for="live_p2_games">Player 2 Games:</label>
+                    <input type="number" id="live_p2_games" name="live_p2_games" min="0" required inputmode="numeric">
+                </div>
+                <div class="score-row">
+                    <label for="live_p2_sets">Player 2 Sets:</label>
+                    <input type="number" id="live_p2_sets" name="live_p2_sets" min="0" required inputmode="numeric">
+                </div>
+            </div>
+            <button type="submit">Calculate</button>
+        </form>
+        <div id="live-results"></div>
+    </div>
+    <script>
+        document.getElementById('live-markov-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            fetch('/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById('live-results').innerText = `${data.live_p1_name} Win Probability: ${result.p1_win_probability.toFixed(2)}%\n${data.live_p2_name} Win Probability: ${result.p2_win_probability.toFixed(2)}%`;
+            });
+        });
+
+        document.getElementById('live_p1_name').addEventListener('input', function(event) {
+            const name = event.target.value || 'Player 1';
+            document.getElementById('live_p1_first_serve_label').innerText = `${name} First Serve Win Percentage:`;
+            document.getElementById('live_p1_second_serve_label').innerText = `${name} Second Serve Win Percentage:`;
+            document.getElementById('live_p1_break_point_label').innerText = `${name} Break Point Conversion Rate:`;
+        });
+
+        document.getElementById('live_p2_name').addEventListener('input', function(event) {
+            const name = event.target.value || 'Player 2';
+            document.getElementById('live_p2_first_serve_label').innerText = `${name} First Serve Win Percentage:`;
+            document.getElementById('live_p2_second_serve_label').innerText = `${name} Second Serve Win Percentage:`;
+            document.getElementById('live_p2_break_point_label').innerText = `${name} Break Point Conversion Rate:`;
+        });
+    </script>
+</body>
+</html>
