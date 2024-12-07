@@ -20,6 +20,11 @@
                 <option value="Player 1">Player 1</option>
                 <option value="Player 2">Player 2</option>
             </select>
+            <label for="include_points">Include Points in Calculation?</label>
+            <select id="include_points" name="include_points" required>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
             <div class="players-container">
                 <div class="player-column">
                     <label for="live_p1_name">Player 1 Name:</label>
@@ -44,9 +49,9 @@
                 </div>
             </div>
             <div class="score-inputs">
-                <div class="score-row">
+                <div class="score-row points-row">
                     <label for="live_p1_points">Player 1 Points:</label>
-                    <input type="text" id="live_p1_points" name="live_p1_points" placeholder="0, 15, 30, 40" pattern="0|15|30|40" required inputmode="numeric">
+                    <input type="text" id="live_p1_points" name="live_p1_points" placeholder="0, 15, 30, 40" pattern="0|15|30|40" inputmode="numeric">
                 </div>
                 <div class="score-row">
                     <label for="live_p1_games">Player 1 Games:</label>
@@ -56,9 +61,9 @@
                     <label for="live_p1_sets">Player 1 Sets:</label>
                     <input type="number" id="live_p1_sets" name="live_p1_sets" min="0" required inputmode="numeric">
                 </div>
-                <div class="score-row">
+                <div class="score-row points-row">
                     <label for="live_p2_points">Player 2 Points:</label>
-                    <input type="text" id="live_p2_points" name="live_p2_points" placeholder="0, 15, 30, 40" pattern="0|15|30|40" required inputmode="numeric">
+                    <input type="text" id="live_p2_points" name="live_p2_points" placeholder="0, 15, 30, 40" pattern="0|15|30|40" inputmode="numeric">
                 </div>
                 <div class="score-row">
                     <label for="live_p2_games">Player 2 Games:</label>
@@ -104,6 +109,17 @@
             document.getElementById('live_p2_second_serve_label').innerText = `${name} Second Serve Win Percentage:`;
             document.getElementById('live_p2_break_point_label').innerText = `${name} Break Point Conversion Rate:`;
         });
+
+        document.getElementById('include_points').addEventListener('change', function(event) {
+            const includePoints = event.target.value;
+            const pointsRows = document.querySelectorAll('.points-row');
+            pointsRows.forEach(row => {
+                row.style.display = includePoints === 'yes' ? 'flex' : 'none';
+            });
+        });
+
+        // Trigger the change event on page load to set the initial state
+        document.getElementById('include_points').dispatchEvent(new Event('change'));
     </script>
 </body>
 </html>
